@@ -1,7 +1,7 @@
 import json
 from typing import Final
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import Application, MessageHandler, CommandHandler, ContextTypes, ConversationHandler
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.ext import Application, MessageHandler, CommandHandler, ContextTypes, ConversationHandler, CallbackQueryHandler
 
 import re
 import telegram.ext.filters as filters
@@ -15,7 +15,7 @@ CHOOSE_BUTTON, GET_ANSWER, GET_USER_FILE = range(3)
 buttons = [
         ['Задать вопрос Антону'],
         ['Отправить файл для МОК-собеса в телегам канале 📁'],
-        ['Забрать промокод -40% на ВСЕ продукты 🛍']
+        ['Забрать промокод -40% на ВСЕ продукты 🛍', 'БЕСПЛАТНЫЕ и полезные работы 🛒']
     ]
 
 # Commands
@@ -32,19 +32,41 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     return CHOOSE_BUTTON
 async def user_did_choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     text = update.message.text
+
     if text == buttons[0][0]:
         await update.message.reply_text(
             "Я рад, что у тебя есть вопрос и жду его 👀"
         )
         return GET_ANSWER
-    elif text == [0][1]:
+    elif text == buttons[1][0]:
         await update.message.reply_text(
             "Отлично, теперь тебе нужно прикрепить файл формата - PDF 📁, ссылки НЕ нужны 🔗"
         )
         return GET_USER_FILE
-    elif text == [0][2]:
-        # WARGING - DONT WORK CHECK KEY
+    elif text == buttons[2][0]:
         await update.message.reply_text("Конечно, вот промокод для ВСЕХ продуктов: SECRET_PROMO_BOT")
+    else:
+        await update.message.reply_text("Сейчас доступен 1 бесплатный WorkBook в рамках телеграмма канала")
+        await context.bot.send_photo(chat_id=f"{update.message.chat_id}", photo=open('classVSStrucrsPreview.png', 'rb'), caption="Более 220 скачиваний, 37+ позитивных отзывов, задачи и практика, отличный дизайн и легкая подача теории! \n\n🔥Ты можешь забрать мой первый продукт - Workbook \"Struct vs classes in Swift: Отличия и как их использовать\" совершенно бесплатно 🚀")
+
+        list_of_buttons = ['Забрать']
+        list_of_urls = ["https://drive.google.com/file/d/1x03HusFQOW_Vs5_SSZcz6GBuOc7bneoW/view"]
+
+        button_list = []
+        for index, each in enumerate(list_of_buttons):
+            button_list.append(InlineKeyboardButton(each, callback_data=each, url=list_of_urls[index]))
+        reply_markup = InlineKeyboardMarkup(build_menu_for_free_product(button_list, n_cols=1))
+        invisible_space = u'\u200B'
+        await context.bot.send_message(chat_id=update.message.chat_id, text="При нажатие на кнопку - будет открыт GoogleDrive,\nгде ты можешь скачать продукт или поделиться им 🙌 ", reply_markup=reply_markup)
+
+def build_menu_for_free_product(buttons,n_cols,header_buttons=None,footer_buttons=None):
+      menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
+      if header_buttons:
+        menu.insert(0, header_buttons)
+      if footer_buttons:
+        menu.append(footer_buttons)
+      return menu
+
 async def send_text_to_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # user_text
     user_input_text = update.message.text
@@ -150,5 +172,16 @@ if __name__ == '__main__':
     app.add_error_handler(error)
 
     # Polling
-    print('Polling')
     app.run_polling(allowed_updates=Update.ALL_TYPES)
+
+    ### Это нужно для будущих обработок кнопок
+
+
+    # app.add_handler(CallbackQueryHandler(free_product_button_didTap))
+
+    # async def free_product_button_didTap(update:Update, context:ContextTypes.DEFAULT_TYPE):
+    #     query = update.callback_query
+    #     await query.answer()
+    #
+    #     print(f"Пользователь выбрал: {query.data}")
+    #     await context.bot.send_document(chat_id=update.callback_query.message.chat.id, document=open('structVsClassesWorkBookFile.pdf', 'rb'))
