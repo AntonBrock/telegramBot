@@ -142,6 +142,7 @@ def build_menu_for_free_product(buttons,n_cols,header_buttons=None,footer_button
       return menu
 
 async def send_text_to_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     # user_text
     user_input_text = update.message.text
 
@@ -150,28 +151,39 @@ async def send_text_to_admin(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user_full_name = update.message.from_user.full_name
     user_message_date = update.message.date
     user_chat_id = update.message.chat_id
-    url = f"https://api.telegram.org/bot{Constants.API_TOKEN}/sendMessage?chat_id={Constants.MY_TELEGRAM_ID}&text=\n\nНОВОЕ СОБЫТИЕ\n\nНикнейм - {user_name},\nИмя - {user_full_name},\nСообщение: \"{user_input_text}\",\n\nДата - {user_message_date},\nЧАТ-ID: {user_chat_id}"
 
-    await update.message.reply_text("Большое спасибо за вопрос, я его получил и скоро отвечу либо в ЛС,\nлибо пришлю ответ прямо сюда 💪")
+    if user_input_text == buttons[0][0] or user_input_text == buttons[1][0] or user_input_text == buttons[2][0] or user_input_text == buttons[2][1]:
+        reply_keyboard = buttons
 
-    # Send text and user info to admin
-    requests.get(url).json()
+        await update.message.reply_text(
+            text="Ты всегда можешь задать вопрос, как будет - возвращайся:)",
+            reply_markup=ReplyKeyboardMarkup(
+                reply_keyboard, one_time_keyboard=True
+            )
+        )
+        return CHOOSE_BUTTON
+    else:
+        url = f"https://api.telegram.org/bot{Constants.API_TOKEN}/sendMessage?chat_id={Constants.MY_TELEGRAM_ID}&text=\n\nНОВОЕ СОБЫТИЕ\n\nНикнейм - {user_name},\nИмя - {user_full_name},\nСообщение: \"{user_input_text}\",\n\nДата - {user_message_date},\nЧАТ-ID: {user_chat_id}"
+        await update.message.reply_text("Большое спасибо за вопрос, я его получил и скоро отвечу либо в ЛС,\nлибо пришлю ответ прямо сюда 💪")
 
-    sticker_id = "CAACAgIAAxkBAAELqbRl7vHKYjfVzvNg4RIwKii8UhwWWwAC8ycAAljPEEmcQEs_PwABJSI0BA"
-    await context.bot.send_sticker(chat_id=update.message.chat_id, sticker=sticker_id)
+        # Send text and user info to admin
+        requests.get(url).json()
 
-    await asyncio.sleep(4)
+        sticker_id = "CAACAgIAAxkBAAELqbRl7vHKYjfVzvNg4RIwKii8UhwWWwAC8ycAAljPEEmcQEs_PwABJSI0BA"
+        await context.bot.send_sticker(chat_id=update.message.chat_id, sticker=sticker_id)
 
-    reply_keyboard = buttons
-    await update.message.reply_text(
-        "Тебя интересует что-то еще?\nСмело задавай вопросы, отправляй CV ну или высылай предложение по контенту 😎",
-        reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard,
-            one_time_keyboard=True
-        ),
-    )
+        await asyncio.sleep(4)
 
-    return CHOOSE_BUTTON
+        reply_keyboard = buttons
+        await update.message.reply_text(
+            "Тебя интересует что-то еще?\nСмело задавай вопросы, отправляй CV ну или высылай предложение по контенту 😎",
+            reply_markup=ReplyKeyboardMarkup(
+                reply_keyboard,
+                one_time_keyboard=True
+            ),
+        )
+
+        return CHOOSE_BUTTON
 
 async def send_file_to_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # user_data
@@ -252,7 +264,6 @@ async def cancel(update: Update):
     )
 
     return ConversationHandler.END
-
 
 
 
