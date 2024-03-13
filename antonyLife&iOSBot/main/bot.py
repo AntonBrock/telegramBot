@@ -1,6 +1,6 @@
 import json
 from typing import Final
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton, InputFile
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton, ChatMember
 from telegram.ext import Application, MessageHandler, CommandHandler, ContextTypes, ConversationHandler
 
 import re
@@ -54,39 +54,81 @@ async def user_did_choose(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         )
         return GET_USER_FILE
     elif text == buttons[2][0]:
+        user_channel_status = await context.bot.get_chat_member(chat_id='-1001757890744', user_id=update.message.from_user.id)
 
-        sticker_id = "CAACAgIAAxkBAAELqadl7u8ThnMd0n9b8ccoPKEk9ki9ygACFiMAAtqbMUmzoUB99tGPpzQE"
-        await context.bot.send_sticker(chat_id=update.message.chat_id, sticker=sticker_id)
+        if user_channel_status.status == 'member':
+            sticker_id = "CAACAgIAAxkBAAELqadl7u8ThnMd0n9b8ccoPKEk9ki9ygACFiMAAtqbMUmzoUB99tGPpzQE"
+            await context.bot.send_sticker(chat_id=update.message.chat_id, sticker=sticker_id)
 
-        await update.message.reply_text(
-            "Конечно, вот промокод для ВСЕХ продуктов: SECRET_PROMO_BOT"
-        )
+            await update.message.reply_text(
+                "Конечно, вот промокод для ВСЕХ продуктов: SECRET_PROMO_BOT"
+            )
 
-        await asyncio.sleep(5)
+            await asyncio.sleep(5)
 
-        reply_keyboard = buttons
-        await update.message.reply_text(
-            "Тебя интересует что-то еще?\nСмело задавай вопросы, отправляй CV ну или высылай предложение по контенту 😎",
-            reply_markup=ReplyKeyboardMarkup(
-                reply_keyboard, one_time_keyboard=True
-            ),
-        )
-        return CHOOSE_BUTTON
+            reply_keyboard = buttons
+            await update.message.reply_text(
+                "Тебя интересует что-то еще?\nСмело задавай вопросы, отправляй CV ну или высылай предложение по контенту 😎",
+                reply_markup=ReplyKeyboardMarkup(
+                    reply_keyboard, one_time_keyboard=True
+                ),
+            )
+            return CHOOSE_BUTTON
+        else:
+            sticker_id = "CAACAgIAAxkBAAELreVl8XYHGM0T4w0K-2ofsQm7YXq4xAACJQADOW9OJngOH1pbpRkgNAQ"
+            await context.bot.send_sticker(chat_id=update.message.chat_id, sticker=sticker_id)
+
+            await update.message.reply_text(
+                "Погоди, сначала подпишись на канал - @dobryninanton"
+            )
+
+            await asyncio.sleep(5)
+
+            reply_keyboard = buttons
+            await update.message.reply_text(
+                "Тебя интересует что-то еще?\nСмело задавай вопросы, отправляй CV ну или высылай предложение по контенту 😎",
+                reply_markup=ReplyKeyboardMarkup(
+                    reply_keyboard, one_time_keyboard=True
+                ),
+            )
+            return CHOOSE_BUTTON
+
     elif text == buttons[2][1]:
-        await update.message.reply_text(
-            "Сейчас доступен 1 бесплатный WorkBook в рамках телеграмма канала"
-        )
-        await context.bot.send_photo(chat_id=f"{update.message.chat_id}", photo=open('classVSStrucrsPreview.png', 'rb'), caption="225+ скачиваний, 39+ позитивных отзывов, задачи и практика, отличный дизайн и легкая подача теории! \n\n🔥Ты можешь забрать мой первый продукт - Workbook \"Struct vs classes in Swift: Отличия и как их использовать\" совершенно бесплатно 🚀")
+        user_channel_status = await context.bot.get_chat_member(chat_id='-1001757890744', user_id=update.message.from_user.id)
 
-        # Кнопка-ссылка внутри текста
-        list_of_buttons = ['Забрать']
-        list_of_urls = ["https://drive.google.com/file/d/1x03HusFQOW_Vs5_SSZcz6GBuOc7bneoW/view"]
+        if user_channel_status.status == 'member':
+            await update.message.reply_text(
+                "Сейчас доступен 1 бесплатный WorkBook в рамках телеграмма канала"
+            )
+            await context.bot.send_photo(chat_id=f"{update.message.chat_id}", photo=open('classVSStrucrsPreview.png', 'rb'), caption="225+ скачиваний, 39+ позитивных отзывов, задачи и практика, отличный дизайн и легкая подача теории! \n\n🔥Ты можешь забрать мой первый продукт - Workbook \"Struct vs classes in Swift: Отличия и как их использовать\" совершенно бесплатно 🚀")
 
-        button_list = []
-        for index, each in enumerate(list_of_buttons):
-            button_list.append(InlineKeyboardButton(each, callback_data=each, url=list_of_urls[index]))
-        reply_markup = InlineKeyboardMarkup(build_menu_for_free_product(button_list, n_cols=1))
-        await context.bot.send_message(chat_id=update.message.chat_id, text="При нажатие на кнопку - будет открыт GoogleDrive,\nгде ты можешь скачать продукт или поделиться им 🙌", reply_markup=reply_markup)
+            # Кнопка-ссылка внутри текста
+            list_of_buttons = ['Забрать']
+            list_of_urls = ["https://drive.google.com/file/d/1x03HusFQOW_Vs5_SSZcz6GBuOc7bneoW/view"]
+
+            button_list = []
+            for index, each in enumerate(list_of_buttons):
+                button_list.append(InlineKeyboardButton(each, callback_data=each, url=list_of_urls[index]))
+            reply_markup = InlineKeyboardMarkup(build_menu_for_free_product(button_list, n_cols=1))
+            await context.bot.send_message(chat_id=update.message.chat_id, text="При нажатие на кнопку - будет открыт GoogleDrive,\nгде ты можешь скачать продукт или поделиться им 🙌", reply_markup=reply_markup)
+        else:
+            sticker_id = "CAACAgIAAxkBAAELreVl8XYHGM0T4w0K-2ofsQm7YXq4xAACJQADOW9OJngOH1pbpRkgNAQ"
+            await context.bot.send_sticker(chat_id=update.message.chat_id, sticker=sticker_id)
+
+            await update.message.reply_text(
+                "Погоди, сначала подпишись на канал - @dobryninanton"
+            )
+
+            await asyncio.sleep(5)
+
+            reply_keyboard = buttons
+            await update.message.reply_text(
+                "Тебя интересует что-то еще?\nСмело задавай вопросы, отправляй CV ну или высылай предложение по контенту 😎",
+                reply_markup=ReplyKeyboardMarkup(
+                    reply_keyboard, one_time_keyboard=True
+                ),
+            )
+            return CHOOSE_BUTTON
     else:
         sticker_id = "CAACAgIAAxkBAAELqbpl7v1lS8P2t4X0CfIKCpIAAdOm2DQAAsNAAAItDThIjnlVjGJ6X-80BA"
         await context.bot.send_sticker(chat_id=update.message.chat_id, sticker=sticker_id)
@@ -172,9 +214,6 @@ async def send_file_to_admin(update: Update, context: ContextTypes.DEFAULT_TYPE)
     )
 
     return CHOOSE_BUTTON
-
-async def send_free_promo_code_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('Держи промокод для ВСЕХ продуктов: SECRET_PROMO_BOT')
 
 async def send_message_to_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_string = update.message.text
