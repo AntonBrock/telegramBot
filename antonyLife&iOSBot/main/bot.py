@@ -1,16 +1,12 @@
 import json
-from typing import Final
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton, ChatMember
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import Application, MessageHandler, CommandHandler, ContextTypes, ConversationHandler
+from Constant import Constants
 
 import re
 import telegram.ext.filters as filters
 import requests
 import asyncio
-
-API_TOKEN: Final = "6992266110:AAFk_o80XlXiF5mq1rszkx3IKu7RvICQXFQ"
-BOT_NAME: Final = "@antony_life_ios_bot"
-MY_TELEGRAM_ID = 222943251
 
 CHOOSE_BUTTON, GET_ANSWER, GET_USER_FILE = range(3)
 buttons = [
@@ -154,7 +150,7 @@ async def send_text_to_admin(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user_full_name = update.message.from_user.full_name
     user_message_date = update.message.date
     user_chat_id = update.message.chat_id
-    url = f"https://api.telegram.org/bot{API_TOKEN}/sendMessage?chat_id={MY_TELEGRAM_ID}&text=\n\nНОВОЕ СОБЫТИЕ\n\nНикнейм - {user_name},\nИмя - {user_full_name},\nСообщение: \"{user_input_text}\",\n\nДата - {user_message_date},\nЧАТ-ID: {user_chat_id}"
+    url = f"https://api.telegram.org/bot{Constants.API_TOKEN}/sendMessage?chat_id={Constants.MY_TELEGRAM_ID}&text=\n\nНОВОЕ СОБЫТИЕ\n\nНикнейм - {user_name},\nИмя - {user_full_name},\nСообщение: \"{user_input_text}\",\n\nДата - {user_message_date},\nЧАТ-ID: {user_chat_id}"
 
     await update.message.reply_text("Большое спасибо за вопрос, я его получил и скоро отвечу либо в ЛС,\nлибо пришлю ответ прямо сюда 💪")
 
@@ -179,20 +175,21 @@ async def send_text_to_admin(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 async def send_file_to_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # user_data
+
     user_input_text = update.message.text
     user_name = update.message.from_user.name
     user_full_name = update.message.from_user.full_name
     user_message_date = update.message.date
     user_chat_id = update.message.chat_id
 
-    url = f"https://api.telegram.org/bot{API_TOKEN}/sendMessage?chat_id={MY_TELEGRAM_ID}&text=\n\nНОВОЕ СОБЫТИЕ - ПОЛУЧЕН ФАЙЛ\n\nНикнейм - {user_name},\nИмя - {user_full_name},\n\nДата - {user_message_date},\nЧАТ-ID: {user_chat_id}"
+    url = f"https://api.telegram.org/bot{Constants.API_TOKEN}/sendMessage?chat_id={Constants.MY_TELEGRAM_ID}&text=\n\nНОВОЕ СОБЫТИЕ - ПОЛУЧЕН ФАЙЛ\n\nНикнейм - {user_name},\nИмя - {user_full_name},\n\nДата - {user_message_date},\nЧАТ-ID: {user_chat_id}"
 
     # Download file
     fileName = update.message.document.file_name
     new_file_id = update.message.document.file_id
 
     # Send file to admin
-    await context.bot.send_document(chat_id=MY_TELEGRAM_ID, document=new_file_id)
+    await context.bot.send_document(chat_id=Constants.MY_TELEGRAM_ID, document=new_file_id)
 
     # Send file to admin
     requests.get(url).json()
@@ -256,10 +253,13 @@ async def cancel(update: Update):
 
     return ConversationHandler.END
 
+
+
+
 ## START
 if __name__ == '__main__':
     print('starting bot')
-    app = Application.builder().token(API_TOKEN).build()
+    app = Application.builder().token(Constants.API_TOKEN).build()
 
     # Commands
     conv_handler = ConversationHandler(
