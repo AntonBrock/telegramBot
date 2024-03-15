@@ -126,12 +126,25 @@ async def user_did_choose(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             )
             return CHOOSE_BUTTON
     else:
-        sticker_id = "CAACAgIAAxkBAAELqbpl7v1lS8P2t4X0CfIKCpIAAdOm2DQAAsNAAAItDThIjnlVjGJ6X-80BA"
-        await context.bot.send_sticker(chat_id=update.message.chat_id, sticker=sticker_id)
+        if update.message.text == "/start":
+            sticker_id = "CAACAgIAAxkBAAELs-1l8_rXhkXn-U7oFQi7h5ip1IMw0gAClygAAn706Ej9AAE51E2InHY0BA"
+            await context.bot.send_sticker(chat_id=update.message.chat_id, sticker=sticker_id)
 
-        await update.message.reply_text(
-            "Я такое не понимаю, если что-то не так, используй /start команду или напиши мне @antonbrock"
-        )
+            reply_keyboard = buttons
+            await update.message.reply_text(
+                "Ооокей, выбирай что интересует ?)",
+                reply_markup=ReplyKeyboardMarkup(
+                    reply_keyboard, one_time_keyboard=True
+                ),
+            )
+            return CHOOSE_BUTTON
+        else:
+            sticker_id = "CAACAgIAAxkBAAELqbpl7v1lS8P2t4X0CfIKCpIAAdOm2DQAAsNAAAItDThIjnlVjGJ6X-80BA"
+            await context.bot.send_sticker(chat_id=update.message.chat_id, sticker=sticker_id)
+
+            await update.message.reply_text(
+                "Я такое не понимаю, если что-то не так, используй /start команду или напиши мне @antonbrock"
+            )
 
 def build_menu_for_free_product(buttons,n_cols,header_buttons=None,footer_buttons=None):
       menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
@@ -264,7 +277,6 @@ async def cancel(update: Update):
     )
 
     return ConversationHandler.END
-
 
 
 ## START
